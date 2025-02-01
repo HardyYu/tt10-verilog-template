@@ -87,7 +87,7 @@ module jump_sound_player (
     end
 
     // Step and Cycle Counter Logic
-    always @(posedge clk or negedge enable) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             step_idx <= 0;
             cycle_counter <= 0;
