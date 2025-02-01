@@ -13,6 +13,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Update apt and fix missing packages
+        run: |
+          sudo apt-get update
+
       - name: Build GDS
         uses: TinyTapeout/tt-gds-action@tt10
         with:
