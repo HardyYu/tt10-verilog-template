@@ -1,8 +1,5 @@
 `default_nettype none
 
-`define CLOCK_SPEED 50000000
-`define PWM_FREQ 60
-
 module game_over_sound_player (
     input wire clk,        // 50 MHz clock input
     input wire rst_n,      // reset on the negative edge
@@ -33,33 +30,31 @@ module game_over_sound_player (
         decay_values[15] = 7300;
     end
 
-    reg [5:0] CCR_stages = 0;   // 30 stages of decay values
+    reg [3:0] CCR_stages = 0;   // 30 stages of decay values
     reg [18:0] ARR_count = 0;   // 19-bit counter for a maximum period of 333333
     reg beep_stage = 0; // width of 1 because there are only two beeps
     reg active;
 
-    always @(negedge rst_n) begin
-        if(!rst_n) begin
+    reg prev_is_over;
+    reg prev_rst_n;
+
+    always @(posedge clk ) begin
+        prev_is_over <= is_over;
+        prev_rst_n <= rst_n;
+
+        if (prev_rst_n && !rst_n) begin // Detect falling edge of rst_n
             CCR_stages <= 0;
             ARR_count <= 0;
             active <= 0;
             beep_stage <= 0;
             wave_out <= 0;
-        end
-    end
-
-    always @(posedge is_over) begin
-        if (is_over) begin
+        end else if (!prev_is_over && is_over) begin // Detect rising edge of is_over
             active <= 1;
             CCR_stages <= 0;
             ARR_count <= 0;
             beep_stage <= 0;
             wave_out <= 0;
-        end 
-    end 
-
-    always @(posedge clk or posedge is_over) begin
-        if (active) begin
+        end else if (active) begin  // running state
             if (beep_stage == 0) begin
                 if (CCR_stages == 15) begin
                     CCR_stages <= 0;

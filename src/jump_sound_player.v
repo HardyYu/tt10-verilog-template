@@ -1,8 +1,5 @@
 `default_nettype none
 
-`define CLOCK_SPEED 50000000
-`define PWM_FREQ 150
-
 module jump_sound_player (
     input wire clk,        // 50 MHz clock input
     input wire enable,     // Signal to enable this module
@@ -47,7 +44,7 @@ module jump_sound_player (
         decay_values[29] = 25;
     end
 
-    reg [5:0] CCR_stages = 0;   // 30 stages of decay values
+    reg [4:0] CCR_stages = 0;   // 30 stages of decay values
     reg [18:0] ARR_count = 0;   // 19-bit counter for a maximum period of 333333
     reg active;
 

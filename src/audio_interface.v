@@ -10,7 +10,7 @@ module audio_interface(
     wire game_over_sound;
 
     always @(*) begin
-        sound <= jump_sound | game_over_sound;
+        sound = jump_sound | game_over_sound;
     end
 
     jump_sound_player i_jump(
