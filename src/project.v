@@ -26,7 +26,7 @@ module tt_um_example (
     .game_is_over(0),   // needs to be replaced
     .jump_pulse(0),     // needs to be replaced
     .sound(uio_out[7])
-  )
+  );
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, ui_in, uio_in, 1'b0};

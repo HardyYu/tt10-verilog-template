@@ -18,14 +18,14 @@ module audio_interface(
         .enable(~game_is_over),
         .sound_trigger(jump_pulse),
         .wave_out(jump_sound)
-    )
+    );
 
     game_over_sound_player i_over(
         .clk(clk),
         .rst_n(rst_n),
         .is_over(game_is_over),
         .wave_out(game_over_sound)
-    )
+    );
 
 endmodule
 
