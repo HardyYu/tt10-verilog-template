@@ -1,4 +1,4 @@
-default_nettype none
+`default_nettype none
 
 module game_over_sound_player (
     input wire clk,        // 50 MHz clock input
