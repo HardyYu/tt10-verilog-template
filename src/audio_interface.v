@@ -10,7 +10,7 @@ module audio_interface(
     wire game_over_sound;
 
     always @(posedge clk or negedge rst_n) begin
-        if (~rst_n) begin
+        if (!rst_n) begin
             sound <= 0;
         end else begin
             sound <= jump_sound | game_over_sound;

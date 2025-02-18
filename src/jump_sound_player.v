@@ -1,5 +1,3 @@
-`default_nettype none
-
 module jump_sound_player (
     input wire clk,        // 50 MHz clock input
     input wire enable,     // Signal to enable this module
@@ -46,6 +44,7 @@ module jump_sound_player (
     reg [18:0] ARR_count = 0;   // 19-bit counter for a maximum period of 333333
     reg active = 0;
     reg prev_sound_trigger = 0;
+    reg temp_wave_out; 
 
     always @(posedge clk) begin
         prev_sound_trigger <= sound_trigger;
@@ -54,11 +53,11 @@ module jump_sound_player (
                 active <= 1;
                 CCR_stages <= 0;
                 ARR_count <= 0;
-                wave_out <= 0;
+                temp_wave_out <= 0;
             end else if (active) begin
                 if (ARR_count >= PWM_ARR_PERIOD) begin // Start new cycle
                     ARR_count <= 0;
-                    wave_out <= 1;
+                    temp_wave_out <= 1;  // Set temp_wave_out to 1
                     CCR_stages <= CCR_stages + 1;
                 end else begin
                     ARR_count <= ARR_count + 1;
@@ -66,38 +65,38 @@ module jump_sound_player (
 
                 // Use the localparam decay values instead of the array
                 case (CCR_stages)
-                    0: wave_out <= (ARR_count < DECAY_0);
-                    1: wave_out <= (ARR_count < DECAY_1);
-                    2: wave_out <= (ARR_count < DECAY_2);
-                    3: wave_out <= (ARR_count < DECAY_3);
-                    4: wave_out <= (ARR_count < DECAY_4);
-                    5: wave_out <= (ARR_count < DECAY_5);
-                    6: wave_out <= (ARR_count < DECAY_6);
-                    7: wave_out <= (ARR_count < DECAY_7);
-                    8: wave_out <= (ARR_count < DECAY_8);
-                    9: wave_out <= (ARR_count < DECAY_9);
-                    10: wave_out <= (ARR_count < DECAY_10);
-                    11: wave_out <= (ARR_count < DECAY_11);
-                    12: wave_out <= (ARR_count < DECAY_12);
-                    13: wave_out <= (ARR_count < DECAY_13);
-                    14: wave_out <= (ARR_count < DECAY_14);
-                    15: wave_out <= (ARR_count < DECAY_15);
-                    16: wave_out <= (ARR_count < DECAY_16);
-                    17: wave_out <= (ARR_count < DECAY_17);
-                    18: wave_out <= (ARR_count < DECAY_18);
-                    19: wave_out <= (ARR_count < DECAY_19);
-                    20: wave_out <= (ARR_count < DECAY_20);
-                    21: wave_out <= (ARR_count < DECAY_21);
-                    22: wave_out <= (ARR_count < DECAY_22);
-                    23: wave_out <= (ARR_count < DECAY_23);
-                    24: wave_out <= (ARR_count < DECAY_24);
-                    25: wave_out <= (ARR_count < DECAY_25);
-                    26: wave_out <= (ARR_count < DECAY_26);
-                    27: wave_out <= (ARR_count < DECAY_27);
-                    28: wave_out <= (ARR_count < DECAY_28);
-                    29: wave_out <= (ARR_count < DECAY_29);
-                    30: wave_out <= (ARR_count < DECAY_30);
-                    default: wave_out <= 0;
+                    0: temp_wave_out <= (ARR_count < DECAY_0);
+                    1: temp_wave_out <= (ARR_count < DECAY_1);
+                    2: temp_wave_out <= (ARR_count < DECAY_2);
+                    3: temp_wave_out <= (ARR_count < DECAY_3);
+                    4: temp_wave_out <= (ARR_count < DECAY_4);
+                    5: temp_wave_out <= (ARR_count < DECAY_5);
+                    6: temp_wave_out <= (ARR_count < DECAY_6);
+                    7: temp_wave_out <= (ARR_count < DECAY_7);
+                    8: temp_wave_out <= (ARR_count < DECAY_8);
+                    9: temp_wave_out <= (ARR_count < DECAY_9);
+                    10: temp_wave_out <= (ARR_count < DECAY_10);
+                    11: temp_wave_out <= (ARR_count < DECAY_11);
+                    12: temp_wave_out <= (ARR_count < DECAY_12);
+                    13: temp_wave_out <= (ARR_count < DECAY_13);
+                    14: temp_wave_out <= (ARR_count < DECAY_14);
+                    15: temp_wave_out <= (ARR_count < DECAY_15);
+                    16: temp_wave_out <= (ARR_count < DECAY_16);
+                    17: temp_wave_out <= (ARR_count < DECAY_17);
+                    18: temp_wave_out <= (ARR_count < DECAY_18);
+                    19: temp_wave_out <= (ARR_count < DECAY_19);
+                    20: temp_wave_out <= (ARR_count < DECAY_20);
+                    21: temp_wave_out <= (ARR_count < DECAY_21);
+                    22: temp_wave_out <= (ARR_count < DECAY_22);
+                    23: temp_wave_out <= (ARR_count < DECAY_23);
+                    24: temp_wave_out <= (ARR_count < DECAY_24);
+                    25: temp_wave_out <= (ARR_count < DECAY_25);
+                    26: temp_wave_out <= (ARR_count < DECAY_26);
+                    27: temp_wave_out <= (ARR_count < DECAY_27);
+                    28: temp_wave_out <= (ARR_count < DECAY_28);
+                    29: temp_wave_out <= (ARR_count < DECAY_29);
+                    30: temp_wave_out <= (ARR_count < DECAY_30);
+                    default: temp_wave_out <= 0;
                 endcase
 
                 if (CCR_stages == 30) begin // Deactivate when all stages are done
@@ -105,14 +104,15 @@ module jump_sound_player (
                     active <= 0;
                 end
             end else begin
-                wave_out <= 0;  // Turn off the square wave when inactive
+                temp_wave_out <= 0;  // Turn off the square wave when inactive
                 ARR_count <= 0;  // Reset counters when inactive
             end
         end else begin
-            wave_out <= 0;  // Turn off the square wave when inactive
+            temp_wave_out <= 0;  // Turn off the square wave when inactive
             ARR_count <= 0;  // Reset counters when inactive
         end
-
     end
+
+    assign wave_out = temp_wave_out;  // Assign the final output
 
 endmodule
