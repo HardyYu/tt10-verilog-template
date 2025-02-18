@@ -76,60 +76,53 @@ module jump_sound_player (
                 CCR_stages  <= 5'd0;
                 ARR_count   <= 19'd0;
                 wave_out    <= 1'b0;
-
             end else if (active) begin
-                //--------------------------------------------------------------
-                // Already active => update counters, wave
-                //--------------------------------------------------------------
-                if (ARR_count >= PWM_ARR_PERIOD) begin
-                    ARR_count  <= 19'd0;
-                    CCR_stages <= CCR_stages + 1'b1;
-                end 
-                else begin
-                    ARR_count <= ARR_count + 1'b1;
-                end
-
-                // Output wave depends on current CCR_stages
-                case (CCR_stages)
-                    0:   wave_out <= (ARR_count < DECAY_0);
-                    1:   wave_out <= (ARR_count < DECAY_1);
-                    2:   wave_out <= (ARR_count < DECAY_2);
-                    3:   wave_out <= (ARR_count < DECAY_3);
-                    4:   wave_out <= (ARR_count < DECAY_4);
-                    5:   wave_out <= (ARR_count < DECAY_5);
-                    6:   wave_out <= (ARR_count < DECAY_6);
-                    7:   wave_out <= (ARR_count < DECAY_7);
-                    8:   wave_out <= (ARR_count < DECAY_8);
-                    9:   wave_out <= (ARR_count < DECAY_9);
-                    10:  wave_out <= (ARR_count < DECAY_10);
-                    11:  wave_out <= (ARR_count < DECAY_11);
-                    12:  wave_out <= (ARR_count < DECAY_12);
-                    13:  wave_out <= (ARR_count < DECAY_13);
-                    14:  wave_out <= (ARR_count < DECAY_14);
-                    15:  wave_out <= (ARR_count < DECAY_15);
-                    16:  wave_out <= (ARR_count < DECAY_16);
-                    17:  wave_out <= (ARR_count < DECAY_17);
-                    18:  wave_out <= (ARR_count < DECAY_18);
-                    19:  wave_out <= (ARR_count < DECAY_19);
-                    20:  wave_out <= (ARR_count < DECAY_20);
-                    21:  wave_out <= (ARR_count < DECAY_21);
-                    22:  wave_out <= (ARR_count < DECAY_22);
-                    23:  wave_out <= (ARR_count < DECAY_23);
-                    24:  wave_out <= (ARR_count < DECAY_24);
-                    25:  wave_out <= (ARR_count < DECAY_25);
-                    26:  wave_out <= (ARR_count < DECAY_26);
-                    27:  wave_out <= (ARR_count < DECAY_27);
-                    28:  wave_out <= (ARR_count < DECAY_28);
-                    29:  wave_out <= (ARR_count < DECAY_29);
-                    30:  wave_out <= (ARR_count < DECAY_30);
-                    default: wave_out <= 1'b0;
-                endcase
-
                 // Check if we finished all stages
                 if (CCR_stages == 5'd30) begin
                     CCR_stages <= 5'd0;
                     active     <= 1'b0;
                     wave_out   <= 1'b0;
+                end else if (ARR_count >= PWM_ARR_PERIOD) begin
+                    ARR_count  <= 19'd0;
+                    CCR_stages <= CCR_stages + 1'b1;
+                end else begin
+                    // Output wave depends on current CCR_stages
+                    case (CCR_stages)
+                        0:   wave_out <= (ARR_count < DECAY_0);
+                        1:   wave_out <= (ARR_count < DECAY_1);
+                        2:   wave_out <= (ARR_count < DECAY_2);
+                        3:   wave_out <= (ARR_count < DECAY_3);
+                        4:   wave_out <= (ARR_count < DECAY_4);
+                        5:   wave_out <= (ARR_count < DECAY_5);
+                        6:   wave_out <= (ARR_count < DECAY_6);
+                        7:   wave_out <= (ARR_count < DECAY_7);
+                        8:   wave_out <= (ARR_count < DECAY_8);
+                        9:   wave_out <= (ARR_count < DECAY_9);
+                        10:  wave_out <= (ARR_count < DECAY_10);
+                        11:  wave_out <= (ARR_count < DECAY_11);
+                        12:  wave_out <= (ARR_count < DECAY_12);
+                        13:  wave_out <= (ARR_count < DECAY_13);
+                        14:  wave_out <= (ARR_count < DECAY_14);
+                        15:  wave_out <= (ARR_count < DECAY_15);
+                        16:  wave_out <= (ARR_count < DECAY_16);
+                        17:  wave_out <= (ARR_count < DECAY_17);
+                        18:  wave_out <= (ARR_count < DECAY_18);
+                        19:  wave_out <= (ARR_count < DECAY_19);
+                        20:  wave_out <= (ARR_count < DECAY_20);
+                        21:  wave_out <= (ARR_count < DECAY_21);
+                        22:  wave_out <= (ARR_count < DECAY_22);
+                        23:  wave_out <= (ARR_count < DECAY_23);
+                        24:  wave_out <= (ARR_count < DECAY_24);
+                        25:  wave_out <= (ARR_count < DECAY_25);
+                        26:  wave_out <= (ARR_count < DECAY_26);
+                        27:  wave_out <= (ARR_count < DECAY_27);
+                        28:  wave_out <= (ARR_count < DECAY_28);
+                        29:  wave_out <= (ARR_count < DECAY_29);
+                        30:  wave_out <= (ARR_count < DECAY_30);
+                        default: wave_out <= 1'b0;
+                    endcase
+
+                    ARR_count <= ARR_count + 1'b1;
                 end
 
             end else begin
