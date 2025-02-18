@@ -40,79 +40,88 @@ module jump_sound_player (
     localparam [18:0] DECAY_29 = 19'd25;
     localparam [18:0] DECAY_30 = 19'd25;
 
-    reg [4:0] CCR_stages = 0;   // 30 stages of decay values
-    reg [18:0] ARR_count = 0;   // 19-bit counter for a maximum period of 333333
-    reg active = 0;
-    reg prev_sound_trigger = 0;
-    reg temp_wave_out; 
+    reg [4:0]  CCR_stages    = 0;
+    reg [18:0] ARR_count     = 0;
+    reg        active        = 0;
+    reg        prev_sound_trigger = 0;
+    reg        temp_wave_out = 0;
 
-    always @(posedge clk) begin
-        prev_sound_trigger <= sound_trigger;
+    // "Next state" signals
+    reg [4:0]  next_CCR_stages;
+    reg [18:0] next_ARR_count;
+    reg        next_active;
+    reg        next_temp_wave_out;
+    reg        next_prev_sound_trigger;
+
+    always @(*) begin
+        // Default next values = hold current values
+        next_CCR_stages       = CCR_stages;
+        next_ARR_count        = ARR_count;
+        next_active           = active;
+        next_temp_wave_out    = temp_wave_out;
+        next_prev_sound_trigger = sound_trigger;  // always track the current trigger
+
         if (enable) begin
-            if (prev_sound_trigger && !sound_trigger) begin
-                active <= 1;
-                CCR_stages <= 0;
-                ARR_count <= 0;
-                temp_wave_out <= 0;
-            end else if (active) begin
-                if (ARR_count >= PWM_ARR_PERIOD) begin // Start new cycle
-                    ARR_count <= 0;
-                    temp_wave_out <= 1;  // Set temp_wave_out to 1
-                    CCR_stages <= CCR_stages + 1;
+            // Detect falling edge: (prev_sound_trigger == 1 && sound_trigger == 0)
+            if ((prev_sound_trigger == 1'b1) && (sound_trigger == 1'b0)) begin
+                next_active        = 1'b1;
+                next_CCR_stages    = 5'd0;
+                next_ARR_count     = 19'd0;
+                next_temp_wave_out = 1'b0;
+            end 
+            else if (active) begin
+                // If still active, handle ARR_count
+                if (ARR_count >= PWM_ARR_PERIOD) begin
+                    next_ARR_count     = 0;
+                    next_CCR_stages    = CCR_stages + 1;
                 end else begin
-                    ARR_count <= ARR_count + 1;
+                    next_ARR_count     = ARR_count + 1;
                 end
 
-                // Use the localparam decay values instead of the array
+                // Update temp_wave_out based on decay stage
                 case (CCR_stages)
-                    0: temp_wave_out <= (ARR_count < DECAY_0);
-                    1: temp_wave_out <= (ARR_count < DECAY_1);
-                    2: temp_wave_out <= (ARR_count < DECAY_2);
-                    3: temp_wave_out <= (ARR_count < DECAY_3);
-                    4: temp_wave_out <= (ARR_count < DECAY_4);
-                    5: temp_wave_out <= (ARR_count < DECAY_5);
-                    6: temp_wave_out <= (ARR_count < DECAY_6);
-                    7: temp_wave_out <= (ARR_count < DECAY_7);
-                    8: temp_wave_out <= (ARR_count < DECAY_8);
-                    9: temp_wave_out <= (ARR_count < DECAY_9);
-                    10: temp_wave_out <= (ARR_count < DECAY_10);
-                    11: temp_wave_out <= (ARR_count < DECAY_11);
-                    12: temp_wave_out <= (ARR_count < DECAY_12);
-                    13: temp_wave_out <= (ARR_count < DECAY_13);
-                    14: temp_wave_out <= (ARR_count < DECAY_14);
-                    15: temp_wave_out <= (ARR_count < DECAY_15);
-                    16: temp_wave_out <= (ARR_count < DECAY_16);
-                    17: temp_wave_out <= (ARR_count < DECAY_17);
-                    18: temp_wave_out <= (ARR_count < DECAY_18);
-                    19: temp_wave_out <= (ARR_count < DECAY_19);
-                    20: temp_wave_out <= (ARR_count < DECAY_20);
-                    21: temp_wave_out <= (ARR_count < DECAY_21);
-                    22: temp_wave_out <= (ARR_count < DECAY_22);
-                    23: temp_wave_out <= (ARR_count < DECAY_23);
-                    24: temp_wave_out <= (ARR_count < DECAY_24);
-                    25: temp_wave_out <= (ARR_count < DECAY_25);
-                    26: temp_wave_out <= (ARR_count < DECAY_26);
-                    27: temp_wave_out <= (ARR_count < DECAY_27);
-                    28: temp_wave_out <= (ARR_count < DECAY_28);
-                    29: temp_wave_out <= (ARR_count < DECAY_29);
-                    30: temp_wave_out <= (ARR_count < DECAY_30);
-                    default: temp_wave_out <= 0;
+                    0:  next_temp_wave_out = (ARR_count < DECAY_0);
+                    1:  next_temp_wave_out = (ARR_count < DECAY_1);
+                    2:  next_temp_wave_out = (ARR_count < DECAY_2);
+                    3:  next_temp_wave_out = (ARR_count < DECAY_3);
+                    // ...
+                    29: next_temp_wave_out = (ARR_count < DECAY_29);
+                    30: next_temp_wave_out = (ARR_count < DECAY_30);
+                    default: next_temp_wave_out = 1'b0;
                 endcase
 
-                if (CCR_stages == 30) begin // Deactivate when all stages are done
-                    CCR_stages <= 0;
-                    active <= 0;
+                // If finished all decay stages, turn off
+                if (CCR_stages == 5'd30) begin
+                    next_CCR_stages    = 5'd0;
+                    next_active        = 1'b0;
+                    next_temp_wave_out = 1'b0;
                 end
-            end else begin
-                temp_wave_out <= 0;  // Turn off the square wave when inactive
-                ARR_count <= 0;  // Reset counters when inactive
+
+            end 
+            else begin
+                // Not active
+                next_temp_wave_out = 1'b0;
+                next_ARR_count     = 19'd0;
             end
-        end else begin
-            temp_wave_out <= 0;  // Turn off the square wave when inactive
-            ARR_count <= 0;  // Reset counters when inactive
+        end
+        else begin
+            // If not enabled
+            next_active        = 1'b0;
+            next_CCR_stages    = 5'd0;
+            next_ARR_count     = 19'd0;
+            next_temp_wave_out = 1'b0;
         end
     end
 
-    assign wave_out = temp_wave_out;  // Assign the final output
+    // Synchronous update of all registers
+    always @(posedge clk) begin
+        CCR_stages       <= next_CCR_stages;
+        ARR_count        <= next_ARR_count;
+        active           <= next_active;
+        temp_wave_out    <= next_temp_wave_out;
+        prev_sound_trigger <= next_prev_sound_trigger;
+    end
+
+    assign wave_out = temp_wave_out;
 
 endmodule
