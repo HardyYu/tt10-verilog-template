@@ -36,11 +36,9 @@ module game_over_sound_player (
     reg active;
 
     reg prev_is_over;
-    reg prev_rst_n;
 
     always @(posedge clk or posedge is_over ) begin
         prev_is_over <= is_over;
-        prev_rst_n <= rst_n;
 
         if (!rst_n) begin // Detect negative level of rst_n
             CCR_stages <= 0;

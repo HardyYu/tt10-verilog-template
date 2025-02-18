@@ -42,15 +42,16 @@ module jump_sound_player (
         decay_values[27] = 1307;
         decay_values[28] = 1307;
         decay_values[29] = 25;
+        decay_values[30] = 25;
     end
 
     reg [4:0] CCR_stages = 0;   // 30 stages of decay values
     reg [18:0] ARR_count = 0;   // 19-bit counter for a maximum period of 333333
-    reg active;
-    reg prev_sound_trigger;
+    reg active = 0;
+    reg prev_sound_trigger = 0;
 
     always @(posedge clk) begin
-        prev_sound_trigger = sound_trigger;
+        prev_sound_trigger <= sound_trigger;
         if (enable) begin
             if (prev_sound_trigger && !sound_trigger) begin
                 active <= 1;
@@ -72,7 +73,7 @@ module jump_sound_player (
                     wave_out <= 0;  // Keep wave low
                 end
 
-                if (CCR_stages == 29 ) begin // Deactive when all stages are done
+                if (CCR_stages == 30 ) begin // Deactive when all stages are done
                     CCR_stages <= 0;
                     active <= 0;
                 end
