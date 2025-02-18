@@ -47,10 +47,12 @@ module jump_sound_player (
     reg [4:0] CCR_stages = 0;   // 30 stages of decay values
     reg [18:0] ARR_count = 0;   // 19-bit counter for a maximum period of 333333
     reg active;
+    reg prev_sound_trigger;
 
-    always @(posedge clk or negedge sound_trigger) begin
+    always @(posedge clk) begin
+        prev_sound_trigger = sound_trigger;
         if (enable) begin
-            if (!sound_trigger) begin
+            if (prev_sound_trigger && !sound_trigger) begin
                 active <= 1;
                 CCR_stages <= 0;
                 ARR_count <= 0;

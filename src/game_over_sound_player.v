@@ -38,11 +38,11 @@ module game_over_sound_player (
     reg prev_is_over;
     reg prev_rst_n;
 
-    always @(posedge clk ) begin
+    always @(posedge clk or posedge is_over ) begin
         prev_is_over <= is_over;
         prev_rst_n <= rst_n;
 
-        if (prev_rst_n && !rst_n) begin // Detect falling edge of rst_n
+        if (!rst_n) begin // Detect negative level of rst_n
             CCR_stages <= 0;
             ARR_count <= 0;
             active <= 0;
