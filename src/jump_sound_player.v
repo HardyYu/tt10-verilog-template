@@ -9,41 +9,38 @@ module jump_sound_player (
 
     localparam [18:0] PWM_ARR_PERIOD = 19'd333333;   // Clock speed / Frequency -> 50MHz / 150Hz 
 
-    reg [18:0] decay_values [0:30];  // Lookup table for precomputed decay values
-
-    initial begin
-        decay_values[0] = 166666;
-        decay_values[1] = 140522;
-        decay_values[2] = 118300;
-        decay_values[3] = 99999;
-        decay_values[4] = 84313;
-        decay_values[5] = 71241;
-        decay_values[6] = 60130;
-        decay_values[7] = 50326;
-        decay_values[8] = 42483;
-        decay_values[9] = 35947;
-        decay_values[10] = 30065;
-        decay_values[11] = 25490;
-        decay_values[12] = 21568;
-        decay_values[13] = 18300;
-        decay_values[14] = 15032;
-        decay_values[15] = 13071;
-        decay_values[16] = 10457;
-        decay_values[17] = 9150;
-        decay_values[18] = 7843;
-        decay_values[19] = 6535;
-        decay_values[20] = 5228;
-        decay_values[21] = 4575;
-        decay_values[22] = 3921;
-        decay_values[23] = 3267;
-        decay_values[24] = 2614;
-        decay_values[25] = 1960;
-        decay_values[26] = 1960;
-        decay_values[27] = 1307;
-        decay_values[28] = 1307;
-        decay_values[29] = 25;
-        decay_values[30] = 25;
-    end
+    // Declare individual localparam values for each stage of decay
+    localparam [18:0] DECAY_0 = 19'd166666;
+    localparam [18:0] DECAY_1 = 19'd140522;
+    localparam [18:0] DECAY_2 = 19'd118300;
+    localparam [18:0] DECAY_3 = 19'd99999;
+    localparam [18:0] DECAY_4 = 19'd84313;
+    localparam [18:0] DECAY_5 = 19'd71241;
+    localparam [18:0] DECAY_6 = 19'd60130;
+    localparam [18:0] DECAY_7 = 19'd50326;
+    localparam [18:0] DECAY_8 = 19'd42483;
+    localparam [18:0] DECAY_9 = 19'd35947;
+    localparam [18:0] DECAY_10 = 19'd30065;
+    localparam [18:0] DECAY_11 = 19'd25490;
+    localparam [18:0] DECAY_12 = 19'd21568;
+    localparam [18:0] DECAY_13 = 19'd18300;
+    localparam [18:0] DECAY_14 = 19'd15032;
+    localparam [18:0] DECAY_15 = 19'd13071;
+    localparam [18:0] DECAY_16 = 19'd10457;
+    localparam [18:0] DECAY_17 = 19'd9150;
+    localparam [18:0] DECAY_18 = 19'd7843;
+    localparam [18:0] DECAY_19 = 19'd6535;
+    localparam [18:0] DECAY_20 = 19'd5228;
+    localparam [18:0] DECAY_21 = 19'd4575;
+    localparam [18:0] DECAY_22 = 19'd3921;
+    localparam [18:0] DECAY_23 = 19'd3267;
+    localparam [18:0] DECAY_24 = 19'd2614;
+    localparam [18:0] DECAY_25 = 19'd1960;
+    localparam [18:0] DECAY_26 = 19'd1960;
+    localparam [18:0] DECAY_27 = 19'd1307;
+    localparam [18:0] DECAY_28 = 19'd1307;
+    localparam [18:0] DECAY_29 = 19'd25;
+    localparam [18:0] DECAY_30 = 19'd25;
 
     reg [4:0] CCR_stages = 0;   // 30 stages of decay values
     reg [18:0] ARR_count = 0;   // 19-bit counter for a maximum period of 333333
@@ -58,32 +55,61 @@ module jump_sound_player (
                 CCR_stages <= 0;
                 ARR_count <= 0;
                 wave_out <= 0;
-            end else if (active)begin
+            end else if (active) begin
                 if (ARR_count >= PWM_ARR_PERIOD) begin // Start new cycle
-                    ARR_count  <= 0;
-                    wave_out    <= 1;
+                    ARR_count <= 0;
+                    wave_out <= 1;
                     CCR_stages <= CCR_stages + 1;
                 end else begin
                     ARR_count <= ARR_count + 1;
                 end
 
-                if (ARR_count < decay_values[CCR_stages]) begin
-                    wave_out <= 1;  // Keep wave high
-                end else begin
-                    wave_out <= 0;  // Keep wave low
-                end
+                // Use the localparam decay values instead of the array
+                case (CCR_stages)
+                    0: wave_out <= (ARR_count < DECAY_0);
+                    1: wave_out <= (ARR_count < DECAY_1);
+                    2: wave_out <= (ARR_count < DECAY_2);
+                    3: wave_out <= (ARR_count < DECAY_3);
+                    4: wave_out <= (ARR_count < DECAY_4);
+                    5: wave_out <= (ARR_count < DECAY_5);
+                    6: wave_out <= (ARR_count < DECAY_6);
+                    7: wave_out <= (ARR_count < DECAY_7);
+                    8: wave_out <= (ARR_count < DECAY_8);
+                    9: wave_out <= (ARR_count < DECAY_9);
+                    10: wave_out <= (ARR_count < DECAY_10);
+                    11: wave_out <= (ARR_count < DECAY_11);
+                    12: wave_out <= (ARR_count < DECAY_12);
+                    13: wave_out <= (ARR_count < DECAY_13);
+                    14: wave_out <= (ARR_count < DECAY_14);
+                    15: wave_out <= (ARR_count < DECAY_15);
+                    16: wave_out <= (ARR_count < DECAY_16);
+                    17: wave_out <= (ARR_count < DECAY_17);
+                    18: wave_out <= (ARR_count < DECAY_18);
+                    19: wave_out <= (ARR_count < DECAY_19);
+                    20: wave_out <= (ARR_count < DECAY_20);
+                    21: wave_out <= (ARR_count < DECAY_21);
+                    22: wave_out <= (ARR_count < DECAY_22);
+                    23: wave_out <= (ARR_count < DECAY_23);
+                    24: wave_out <= (ARR_count < DECAY_24);
+                    25: wave_out <= (ARR_count < DECAY_25);
+                    26: wave_out <= (ARR_count < DECAY_26);
+                    27: wave_out <= (ARR_count < DECAY_27);
+                    28: wave_out <= (ARR_count < DECAY_28);
+                    29: wave_out <= (ARR_count < DECAY_29);
+                    default: wave_out <= 0;
+                endcase
 
-                if (CCR_stages == 30 ) begin // Deactive when all stages are done
+                if (CCR_stages == 30) begin // Deactivate when all stages are done
                     CCR_stages <= 0;
                     active <= 0;
                 end
             end else begin
-                wave_out    <= 0;  // Turn off the square wave when inactive
-                ARR_count  <= 0;  // Reset counters when inactive
+                wave_out <= 0;  // Turn off the square wave when inactive
+                ARR_count <= 0;  // Reset counters when inactive
             end
         end else begin
-            wave_out    <= 0;  // Turn off the square wave when inactive
-            ARR_count  <= 0;  // Reset counters when inactive
+            wave_out <= 0;  // Turn off the square wave when inactive
+            ARR_count <= 0;  // Reset counters when inactive
         end
 
     end
