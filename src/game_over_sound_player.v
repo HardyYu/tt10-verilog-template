@@ -1,4 +1,4 @@
-`default_nettype none
+default_nettype none
 
 module game_over_sound_player (
     input wire clk,        // 50 MHz clock input
@@ -9,28 +9,25 @@ module game_over_sound_player (
 
     localparam [18:0] PERIOD = 19'd200000;   // Clock speed / Frequency -> 50MHz / 660Hz 
 
-    reg [18:0] decay_values [0:15];  // Lookup table for precomputed decay values
+    // Distinct localparams for decay values
+    localparam [18:0] DECAY_0  = 37878;
+    localparam [18:0] DECAY_1  = 33842;
+    localparam [18:0] DECAY_2  = 30208;
+    localparam [18:0] DECAY_3  = 26940;
+    localparam [18:0] DECAY_4  = 24008;
+    localparam [18:0] DECAY_5  = 21383;
+    localparam [18:0] DECAY_6  = 19043;
+    localparam [18:0] DECAY_7  = 16966;
+    localparam [18:0] DECAY_8  = 15135;
+    localparam [18:0] DECAY_9  = 13530;
+    localparam [18:0] DECAY_10 = 12132;
+    localparam [18:0] DECAY_11 = 10924;
+    localparam [18:0] DECAY_12 = 9879;
+    localparam [18:0] DECAY_13 = 8932;
+    localparam [18:0] DECAY_14 = 8076;
+    localparam [18:0] DECAY_15 = 7300;
 
-    initial begin
-        decay_values[0]  = 37878;
-        decay_values[1]  = 33842;
-        decay_values[2]  = 30208;
-        decay_values[3]  = 26940;
-        decay_values[4]  = 24008;
-        decay_values[5]  = 21383;
-        decay_values[6]  = 19043;
-        decay_values[7]  = 16966;
-        decay_values[8]  = 15135;
-        decay_values[9]  = 13530;
-        decay_values[10] = 12132;
-        decay_values[11] = 10924;
-        decay_values[12] = 9879;
-        decay_values[13] = 8932;
-        decay_values[14] = 8076;
-        decay_values[15] = 7300;
-    end
-
-    reg [3:0] CCR_stages = 0;   // 30 stages of decay values
+    reg [3:0] CCR_stages = 0;   // 16 stages of decay values
     reg [18:0] ARR_count = 0;   // 19-bit counter for a maximum period of 333333
     reg beep_stage = 0; // width of 1 because there are only two beeps
     reg active;
@@ -73,11 +70,25 @@ module game_over_sound_player (
                 ARR_count <= ARR_count + 1;
             end
 
-            if (ARR_count < decay_values[CCR_stages]) begin
-                wave_out <= 1;  // Keep wave high
-            end else begin
-                wave_out <= 0;  // Keep wave low
-            end
+            // Use the distinct localparams instead of array lookup
+            case (CCR_stages)
+                4'd0: wave_out <= (ARR_count < DECAY_0)  ? 1 : 0;
+                4'd1: wave_out <= (ARR_count < DECAY_1)  ? 1 : 0;
+                4'd2: wave_out <= (ARR_count < DECAY_2)  ? 1 : 0;
+                4'd3: wave_out <= (ARR_count < DECAY_3)  ? 1 : 0;
+                4'd4: wave_out <= (ARR_count < DECAY_4)  ? 1 : 0;
+                4'd5: wave_out <= (ARR_count < DECAY_5)  ? 1 : 0;
+                4'd6: wave_out <= (ARR_count < DECAY_6)  ? 1 : 0;
+                4'd7: wave_out <= (ARR_count < DECAY_7)  ? 1 : 0;
+                4'd8: wave_out <= (ARR_count < DECAY_8)  ? 1 : 0;
+                4'd9: wave_out <= (ARR_count < DECAY_9)  ? 1 : 0;
+                4'd10: wave_out <= (ARR_count < DECAY_10) ? 1 : 0;
+                4'd11: wave_out <= (ARR_count < DECAY_11) ? 1 : 0;
+                4'd12: wave_out <= (ARR_count < DECAY_12) ? 1 : 0;
+                4'd13: wave_out <= (ARR_count < DECAY_13) ? 1 : 0;
+                4'd14: wave_out <= (ARR_count < DECAY_14) ? 1 : 0;
+                4'd15: wave_out <= (ARR_count < DECAY_15) ? 1 : 0;
+            endcase
 
         end else begin
             wave_out    <= 0;  // Turn off the square wave when inactive

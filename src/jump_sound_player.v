@@ -96,6 +96,7 @@ module jump_sound_player (
                     27: wave_out <= (ARR_count < DECAY_27);
                     28: wave_out <= (ARR_count < DECAY_28);
                     29: wave_out <= (ARR_count < DECAY_29);
+                    30: wave_out <= (ARR_count < DECAY_30);
                     default: wave_out <= 0;
                 endcase
 
