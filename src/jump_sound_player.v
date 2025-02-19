@@ -2,117 +2,87 @@ module jump_sound_player (
     input wire clk,             // 50 MHz clock
     input wire enable,          // Enable this module
     input wire sound_trigger,   // One-shot pulse signal to generate sound
-    output reg wave_out         // Square wave output (registered)
+    output reg wave_out         // PWM output
 );
 
-    localparam [18:0] PWM_ARR_PERIOD = 19'd333333;
+    // Constants
+    localparam integer SAMPLE_COUNT = 32;  // Number of sine samples
+    localparam integer PWM_PERIOD   = 512; // PWM period for duty cycle
 
-    // Define each decay value as a separate localparam
-    localparam [18:0] DECAY_0  = 19'd166666;
-    localparam [18:0] DECAY_1  = 19'd140522;
-    localparam [18:0] DECAY_2  = 19'd118300;
-    localparam [18:0] DECAY_3  = 19'd99999;
-    localparam [18:0] DECAY_4  = 19'd84313;
-    localparam [18:0] DECAY_5  = 19'd71241;
-    localparam [18:0] DECAY_6  = 19'd60130;
-    localparam [18:0] DECAY_7  = 19'd50326;
-    localparam [18:0] DECAY_8  = 19'd42483;
-    localparam [18:0] DECAY_9  = 19'd35947;
-    localparam [18:0] DECAY_10 = 19'd30065;
-    localparam [18:0] DECAY_11 = 19'd25490;
-    localparam [18:0] DECAY_12 = 19'd21568;
-    localparam [18:0] DECAY_13 = 19'd18300;
-    localparam [18:0] DECAY_14 = 19'd15032;
-    localparam [18:0] DECAY_15 = 19'd13071;
-    localparam [18:0] DECAY_16 = 19'd10457;
-    localparam [18:0] DECAY_17 = 19'd9150;
-    localparam [18:0] DECAY_18 = 19'd7843;
-    localparam [18:0] DECAY_19 = 19'd6535;
-    localparam [18:0] DECAY_20 = 19'd5228;
-    localparam [18:0] DECAY_21 = 19'd4575;
-    localparam [18:0] DECAY_22 = 19'd3921;
-    localparam [18:0] DECAY_23 = 19'd3267;
-    localparam [18:0] DECAY_24 = 19'd2614;
-    localparam [18:0] DECAY_25 = 19'd1960;
-    localparam [18:0] DECAY_26 = 19'd1960;
-    localparam [18:0] DECAY_27 = 19'd1307;
-    localparam [18:0] DECAY_28 = 19'd1307;
-    localparam [18:0] DECAY_29 = 19'd25;
-    localparam [18:0] DECAY_30 = 19'd25;
+    // Registers
+    reg [5:0]  sample_index = 0;  // Sine wave step
+    reg [8:0]  pwm_counter = 0;   // PWM counter
+    reg        playing = 0;       // Playback flag
+    reg        prev_trigger = 0;  // Edge detection
 
-    reg [4:0]  CCR_stages = 0;
-    reg [18:0] ARR_count = 0;
-    reg        active = 0;
-    reg        prev_sound_trigger = 0;
+    // Function to return sine sample
+    function [8:0] sine_sample;
+        input [5:0] index;
+        case (index)
+            6'd0:  sine_sample = 9'd0;
+            6'd1:  sine_sample = 9'd25;
+            6'd2:  sine_sample = 9'd50;
+            6'd3:  sine_sample = 9'd74;
+            6'd4:  sine_sample = 9'd98;
+            6'd5:  sine_sample = 9'd120;
+            6'd6:  sine_sample = 9'd141;
+            6'd7:  sine_sample = 9'd161;
+            6'd8:  sine_sample = 9'd180;
+            6'd9:  sine_sample = 9'd197;
+            6'd10: sine_sample = 9'd213;
+            6'd11: sine_sample = 9'd226;
+            6'd12: sine_sample = 9'd238;
+            6'd13: sine_sample = 9'd248;
+            6'd14: sine_sample = 9'd255;
+            6'd15: sine_sample = 9'd260;
+            6'd16: sine_sample = 9'd263;
+            6'd17: sine_sample = 9'd265;
+            6'd18: sine_sample = 9'd263;
+            6'd19: sine_sample = 9'd260;
+            6'd20: sine_sample = 9'd255;
+            6'd21: sine_sample = 9'd248;
+            6'd22: sine_sample = 9'd238;
+            6'd23: sine_sample = 9'd226;
+            6'd24: sine_sample = 9'd213;
+            6'd25: sine_sample = 9'd197;
+            6'd26: sine_sample = 9'd180;
+            6'd27: sine_sample = 9'd161;
+            6'd28: sine_sample = 9'd141;
+            6'd29: sine_sample = 9'd120;
+            6'd30: sine_sample = 9'd98;
+            6'd31: sine_sample = 9'd74;
+            default: sine_sample = 9'd0;
+        endcase
+    endfunction
 
     always @(posedge clk) begin
-        prev_sound_trigger <= sound_trigger;
-
-        // Default to prevent latch inference
-        wave_out <= 1'b0;
+        prev_trigger <= sound_trigger;
 
         if (!enable) begin
-            active      <= 1'b0;
-            CCR_stages  <= 5'd0;
-            ARR_count   <= 19'd0;
+            playing       <= 1'b0;
+            sample_index  <= 0;
+            pwm_counter   <= 0;
+            wave_out      <= 0;
         end 
-        else if (prev_sound_trigger && !sound_trigger) begin
-            active      <= 1'b1;
-            CCR_stages  <= 5'd0;
-            ARR_count   <= 19'd0;
+        else if (!prev_trigger && sound_trigger) begin
+            playing      <= 1'b1;
+            sample_index <= 0;
+            pwm_counter  <= 0;
         end 
-        else if (active) begin
-            if (ARR_count >= PWM_ARR_PERIOD) begin
-                ARR_count  <= 19'd0;
-                CCR_stages <= CCR_stages + 1'b1;
-            end 
-            else begin
-                ARR_count <= ARR_count + 1'b1;
+        else if (playing) begin
+            if (pwm_counter < PWM_PERIOD) begin
+                pwm_counter <= pwm_counter + 1;
+            end else begin
+                pwm_counter  <= 0;
+                sample_index <= sample_index + 1;
             end
 
-            if (CCR_stages < 5'd30) begin
-                case (CCR_stages)
-                    5'd0:  wave_out <= (ARR_count < DECAY_0);
-                    5'd1:  wave_out <= (ARR_count < DECAY_1);
-                    5'd2:  wave_out <= (ARR_count < DECAY_2);
-                    5'd3:  wave_out <= (ARR_count < DECAY_3);
-                    5'd4:  wave_out <= (ARR_count < DECAY_4);
-                    5'd5:  wave_out <= (ARR_count < DECAY_5);
-                    5'd6:  wave_out <= (ARR_count < DECAY_6);
-                    5'd7:  wave_out <= (ARR_count < DECAY_7);
-                    5'd8:  wave_out <= (ARR_count < DECAY_8);
-                    5'd9:  wave_out <= (ARR_count < DECAY_9);
-                    5'd10: wave_out <= (ARR_count < DECAY_10);
-                    5'd11: wave_out <= (ARR_count < DECAY_11);
-                    5'd12: wave_out <= (ARR_count < DECAY_12);
-                    5'd13: wave_out <= (ARR_count < DECAY_13);
-                    5'd14: wave_out <= (ARR_count < DECAY_14);
-                    5'd15: wave_out <= (ARR_count < DECAY_15);
-                    5'd16: wave_out <= (ARR_count < DECAY_16);
-                    5'd17: wave_out <= (ARR_count < DECAY_17);
-                    5'd18: wave_out <= (ARR_count < DECAY_18);
-                    5'd19: wave_out <= (ARR_count < DECAY_19);
-                    5'd20: wave_out <= (ARR_count < DECAY_20);
-                    5'd21: wave_out <= (ARR_count < DECAY_21);
-                    5'd22: wave_out <= (ARR_count < DECAY_22);
-                    5'd23: wave_out <= (ARR_count < DECAY_23);
-                    5'd24: wave_out <= (ARR_count < DECAY_24);
-                    5'd25: wave_out <= (ARR_count < DECAY_25);
-                    5'd26: wave_out <= (ARR_count < DECAY_26);
-                    5'd27: wave_out <= (ARR_count < DECAY_27);
-                    5'd28: wave_out <= (ARR_count < DECAY_28);
-                    5'd29: wave_out <= (ARR_count < DECAY_29);
-                    5'd30: wave_out <= (ARR_count < DECAY_30);
-                    default: wave_out <= 1'b0;
-                endcase
-            end 
-            else begin
-                active     <= 1'b0;
-                CCR_stages <= 5'd0;
+            if (sample_index < SAMPLE_COUNT) begin
+                wave_out <= (pwm_counter < sine_sample(sample_index));
+            end else begin
+                playing  <= 1'b0;
+                wave_out <= 1'b0;
             end
-        end 
-        else begin
-            ARR_count <= 19'd0;
         end
     end
 endmodule
