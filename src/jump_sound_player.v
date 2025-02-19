@@ -53,23 +53,28 @@ module jump_sound_player (
             CCR_stages  <= 5'd0;
             ARR_count   <= 19'd0;
             wave_out    <= 1'b0;
-        end else if (prev_sound_trigger && !sound_trigger) begin
+        end 
+        else if (prev_sound_trigger && !sound_trigger) begin
             active      <= 1'b1;
             CCR_stages  <= 5'd0;
             ARR_count   <= 19'd0;
             wave_out    <= 1'b0;
-        end else if (active) begin
+        end 
+        else if (active) begin
+            if (ARR_count >= PWM_ARR_PERIOD) begin
+                ARR_count  <= 19'd0;
+                CCR_stages <= CCR_stages + 1'b1;
+            end 
+            else begin
+                ARR_count <= ARR_count + 1'b1;
+            end
+
             if (CCR_stages == 5'd30) begin
-                active     <= 1'b0;
+                active <= 1'b0;
                 CCR_stages <= 5'd0;
-                wave_out   <= 1'b0;
-            end else begin
-                if (ARR_count >= PWM_ARR_PERIOD) begin
-                    ARR_count  <= 19'd0;
-                    CCR_stages <= CCR_stages + 1'b1;
-                end else begin
-                    ARR_count <= ARR_count + 1'b1;
-                end
+                wave_out <= 1'b0;
+            end 
+            else begin
                 case (CCR_stages)
                     0:   wave_out <= (ARR_count < DECAY_0);
                     1:   wave_out <= (ARR_count < DECAY_1);
@@ -105,7 +110,8 @@ module jump_sound_player (
                     default: wave_out <= 1'b0;
                 endcase
             end
-        end else begin
+        end 
+        else begin
             ARR_count <= 19'd0;
             wave_out  <= 1'b0;
         end
