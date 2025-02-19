@@ -7,7 +7,7 @@ module jump_sound_player (
 
     localparam [18:0] PWM_ARR_PERIOD = 19'd333333;
 
-    localparam [18:0] DECAY [0:30] = '{
+    localparam [18:0] DECAY [0:30] = {
         19'd166666, 19'd140522, 19'd118300, 19'd99999, 19'd84313,
         19'd71241, 19'd60130, 19'd50326, 19'd42483, 19'd35947,
         19'd30065, 19'd25490, 19'd21568, 19'd18300, 19'd15032,
