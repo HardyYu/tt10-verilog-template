@@ -7,7 +7,7 @@ module jump_sound_player (
 
     localparam [18:0] PWM_ARR_PERIOD = 19'd333333;
 
-    // Define DECAY values individually for pure Verilog compatibility
+    // Define each decay value as a separate localparam
     localparam [18:0] DECAY_0  = 19'd166666;
     localparam [18:0] DECAY_1  = 19'd140522;
     localparam [18:0] DECAY_2  = 19'd118300;
@@ -48,17 +48,18 @@ module jump_sound_player (
     always @(posedge clk) begin
         prev_sound_trigger <= sound_trigger;
 
+        // Default to prevent latch inference
+        wave_out <= 1'b0;
+
         if (!enable) begin
             active      <= 1'b0;
             CCR_stages  <= 5'd0;
             ARR_count   <= 19'd0;
-            wave_out    <= 1'b0;
         end 
         else if (prev_sound_trigger && !sound_trigger) begin
             active      <= 1'b1;
             CCR_stages  <= 5'd0;
             ARR_count   <= 19'd0;
-            wave_out    <= 1'b0;
         end 
         else if (active) begin
             if (ARR_count >= PWM_ARR_PERIOD) begin
@@ -69,51 +70,49 @@ module jump_sound_player (
                 ARR_count <= ARR_count + 1'b1;
             end
 
-            if (CCR_stages == 5'd30) begin
-                active <= 1'b0;
-                CCR_stages <= 5'd0;
-                wave_out <= 1'b0;
-            end 
-            else begin
+            if (CCR_stages < 5'd30) begin
                 case (CCR_stages)
-                    0:   wave_out <= (ARR_count < DECAY_0);
-                    1:   wave_out <= (ARR_count < DECAY_1);
-                    2:   wave_out <= (ARR_count < DECAY_2);
-                    3:   wave_out <= (ARR_count < DECAY_3);
-                    4:   wave_out <= (ARR_count < DECAY_4);
-                    5:   wave_out <= (ARR_count < DECAY_5);
-                    6:   wave_out <= (ARR_count < DECAY_6);
-                    7:   wave_out <= (ARR_count < DECAY_7);
-                    8:   wave_out <= (ARR_count < DECAY_8);
-                    9:   wave_out <= (ARR_count < DECAY_9);
-                    10:  wave_out <= (ARR_count < DECAY_10);
-                    11:  wave_out <= (ARR_count < DECAY_11);
-                    12:  wave_out <= (ARR_count < DECAY_12);
-                    13:  wave_out <= (ARR_count < DECAY_13);
-                    14:  wave_out <= (ARR_count < DECAY_14);
-                    15:  wave_out <= (ARR_count < DECAY_15);
-                    16:  wave_out <= (ARR_count < DECAY_16);
-                    17:  wave_out <= (ARR_count < DECAY_17);
-                    18:  wave_out <= (ARR_count < DECAY_18);
-                    19:  wave_out <= (ARR_count < DECAY_19);
-                    20:  wave_out <= (ARR_count < DECAY_20);
-                    21:  wave_out <= (ARR_count < DECAY_21);
-                    22:  wave_out <= (ARR_count < DECAY_22);
-                    23:  wave_out <= (ARR_count < DECAY_23);
-                    24:  wave_out <= (ARR_count < DECAY_24);
-                    25:  wave_out <= (ARR_count < DECAY_25);
-                    26:  wave_out <= (ARR_count < DECAY_26);
-                    27:  wave_out <= (ARR_count < DECAY_27);
-                    28:  wave_out <= (ARR_count < DECAY_28);
-                    29:  wave_out <= (ARR_count < DECAY_29);
-                    30:  wave_out <= (ARR_count < DECAY_30);
+                    5'd0:  wave_out <= (ARR_count < DECAY_0);
+                    5'd1:  wave_out <= (ARR_count < DECAY_1);
+                    5'd2:  wave_out <= (ARR_count < DECAY_2);
+                    5'd3:  wave_out <= (ARR_count < DECAY_3);
+                    5'd4:  wave_out <= (ARR_count < DECAY_4);
+                    5'd5:  wave_out <= (ARR_count < DECAY_5);
+                    5'd6:  wave_out <= (ARR_count < DECAY_6);
+                    5'd7:  wave_out <= (ARR_count < DECAY_7);
+                    5'd8:  wave_out <= (ARR_count < DECAY_8);
+                    5'd9:  wave_out <= (ARR_count < DECAY_9);
+                    5'd10: wave_out <= (ARR_count < DECAY_10);
+                    5'd11: wave_out <= (ARR_count < DECAY_11);
+                    5'd12: wave_out <= (ARR_count < DECAY_12);
+                    5'd13: wave_out <= (ARR_count < DECAY_13);
+                    5'd14: wave_out <= (ARR_count < DECAY_14);
+                    5'd15: wave_out <= (ARR_count < DECAY_15);
+                    5'd16: wave_out <= (ARR_count < DECAY_16);
+                    5'd17: wave_out <= (ARR_count < DECAY_17);
+                    5'd18: wave_out <= (ARR_count < DECAY_18);
+                    5'd19: wave_out <= (ARR_count < DECAY_19);
+                    5'd20: wave_out <= (ARR_count < DECAY_20);
+                    5'd21: wave_out <= (ARR_count < DECAY_21);
+                    5'd22: wave_out <= (ARR_count < DECAY_22);
+                    5'd23: wave_out <= (ARR_count < DECAY_23);
+                    5'd24: wave_out <= (ARR_count < DECAY_24);
+                    5'd25: wave_out <= (ARR_count < DECAY_25);
+                    5'd26: wave_out <= (ARR_count < DECAY_26);
+                    5'd27: wave_out <= (ARR_count < DECAY_27);
+                    5'd28: wave_out <= (ARR_count < DECAY_28);
+                    5'd29: wave_out <= (ARR_count < DECAY_29);
+                    5'd30: wave_out <= (ARR_count < DECAY_30);
                     default: wave_out <= 1'b0;
                 endcase
+            end 
+            else begin
+                active     <= 1'b0;
+                CCR_stages <= 5'd0;
             end
         end 
         else begin
             ARR_count <= 19'd0;
-            wave_out  <= 1'b0;
         end
     end
 endmodule
