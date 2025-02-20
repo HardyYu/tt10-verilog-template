@@ -20,8 +20,7 @@ module jump_sound_player (
     typedef enum logic [1:0] {
         IDLE  = 2'b00,
         PLAY  = 2'b01,
-        DECAY = 2'b10,
-        DONE  = 2'b11
+        DONE  = 2'b10
     } state_t;
 
     state_t state = IDLE;
