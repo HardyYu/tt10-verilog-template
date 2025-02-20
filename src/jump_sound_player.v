@@ -53,10 +53,10 @@ module jump_sound_player (
                     end
 
                     if (counter >= PWM_ARR_PERIOD) begin  // Once we complete a full cycle
-                        if (stage_index < 30)
+                        if (stage_index < 30) begin
                             wave_out    <= 1;
                             stage_index <= stage_index + 1;
-                        else
+                        end else
                             state <= DONE;
                     end
                 end
