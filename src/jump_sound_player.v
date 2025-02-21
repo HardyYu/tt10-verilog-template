@@ -54,11 +54,11 @@ module jump_sound_player (
     reg [18:0] counter     = 0;  // PWM period counter
     reg        active      = 0;  // Active flag
     reg [18:0] decay_value;
-    
+
     // State Register
     always @(posedge clk) begin
-        if (!rst_n)
-            state <= STATE_IDLE;
+        if (!enable)
+            state <= IDLE;
         else
             state <= next_state;
     end
