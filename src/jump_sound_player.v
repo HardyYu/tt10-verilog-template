@@ -58,7 +58,6 @@ module jump_sound_player (
     always @(posedge clk) begin
         if (!enable) begin
             state       <= IDLE;
-            active      <= 0;
             stage_index <= 0;
             wave_out    <= 0;
         end
@@ -67,7 +66,6 @@ module jump_sound_player (
                 IDLE: begin
                     if (sound_trigger) begin
                         state       <= PLAY;
-                        active      <= 1;
                         stage_index <= 0;
                         counter     <= 0;
                         wave_out    <= 1;
@@ -75,7 +73,7 @@ module jump_sound_player (
                 end
                 
                 PLAY: begin
-                    if (counter >= decay_value) begin
+                    if (counter >= DECAY_0) begin
                         wave_out <= 0;  // Toggle waveform
                         counter  <= 0;
                     end
@@ -90,44 +88,43 @@ module jump_sound_player (
                         end else
                             state <= DONE;
                     end
-                    case (stage_index)
-                        5'd0:  decay_value <= DECAY_0;
-                        5'd1:  decay_value <= DECAY_1;
-                        5'd2:  decay_value <= DECAY_2;
-                        5'd3:  decay_value <= DECAY_3;
-                        5'd4:  decay_value <= DECAY_4;
-                        5'd5:  decay_value <= DECAY_5;
-                        5'd6:  decay_value <= DECAY_6;
-                        5'd7:  decay_value <= DECAY_7;
-                        5'd8:  decay_value <= DECAY_8;
-                        5'd9:  decay_value <= DECAY_9;
-                        5'd10: decay_value <= DECAY_10;
-                        5'd11: decay_value <= DECAY_11;
-                        5'd12: decay_value <= DECAY_12;
-                        5'd13: decay_value <= DECAY_13;
-                        5'd14: decay_value <= DECAY_14;
-                        5'd15: decay_value <= DECAY_15;
-                        5'd16: decay_value <= DECAY_16;
-                        5'd17: decay_value <= DECAY_17;
-                        5'd18: decay_value <= DECAY_18;
-                        5'd19: decay_value <= DECAY_19;
-                        5'd20: decay_value <= DECAY_20;
-                        5'd21: decay_value <= DECAY_21;
-                        5'd22: decay_value <= DECAY_22;
-                        5'd23: decay_value <= DECAY_23;
-                        5'd24: decay_value <= DECAY_24;
-                        5'd25: decay_value <= DECAY_25;
-                        5'd26: decay_value <= DECAY_26;
-                        5'd27: decay_value <= DECAY_27;
-                        5'd28: decay_value <= DECAY_28;
-                        5'd29: decay_value <= DECAY_29;
-                        5'd30: decay_value <= DECAY_30;
-                        default: decay_value <= 19'd25;
-                    endcase
+                    // case (stage_index)
+                    //     5'd0:  decay_value <= DECAY_0;
+                    //     5'd1:  decay_value <= DECAY_1;
+                    //     5'd2:  decay_value <= DECAY_2;
+                    //     5'd3:  decay_value <= DECAY_3;
+                    //     5'd4:  decay_value <= DECAY_4;
+                    //     5'd5:  decay_value <= DECAY_5;
+                    //     5'd6:  decay_value <= DECAY_6;
+                    //     5'd7:  decay_value <= DECAY_7;
+                    //     5'd8:  decay_value <= DECAY_8;
+                    //     5'd9:  decay_value <= DECAY_9;
+                    //     5'd10: decay_value <= DECAY_10;
+                    //     5'd11: decay_value <= DECAY_11;
+                    //     5'd12: decay_value <= DECAY_12;
+                    //     5'd13: decay_value <= DECAY_13;
+                    //     5'd14: decay_value <= DECAY_14;
+                    //     5'd15: decay_value <= DECAY_15;
+                    //     5'd16: decay_value <= DECAY_16;
+                    //     5'd17: decay_value <= DECAY_17;
+                    //     5'd18: decay_value <= DECAY_18;
+                    //     5'd19: decay_value <= DECAY_19;
+                    //     5'd20: decay_value <= DECAY_20;
+                    //     5'd21: decay_value <= DECAY_21;
+                    //     5'd22: decay_value <= DECAY_22;
+                    //     5'd23: decay_value <= DECAY_23;
+                    //     5'd24: decay_value <= DECAY_24;
+                    //     5'd25: decay_value <= DECAY_25;
+                    //     5'd26: decay_value <= DECAY_26;
+                    //     5'd27: decay_value <= DECAY_27;
+                    //     5'd28: decay_value <= DECAY_28;
+                    //     5'd29: decay_value <= DECAY_29;
+                    //     5'd30: decay_value <= DECAY_30;
+                    //     default: decay_value <= 19'd25;
+                    // endcase
                 end
                 
                 DONE: begin
-                    active   <= 0;
                     wave_out <= 0;
                     state    <= IDLE;
                 end
