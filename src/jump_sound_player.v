@@ -1,6 +1,6 @@
 module jump_sound_player (
     input wire clk,             // 50 MHz clock
-    input wire enable,          // Enable this module
+    input wire rst_n,          // Enable this module
     input wire sound_trigger,   // One-shot pulse signal to generate sound
     output reg wave_out         // Square wave output (registered)
 );
@@ -57,7 +57,7 @@ module jump_sound_player (
 
     // State Register
     always @(posedge clk) begin
-        if (!enable)
+        if (!rst_n)
             state <= IDLE;
         else
             state <= next_state;
@@ -89,8 +89,7 @@ module jump_sound_player (
 
     // State Machine
     always @(posedge clk) begin
-        if (!enable) begin
-            state       <= IDLE;
+        if (!rst_n) begin
             stage_index <= 0;
             wave_out    <= 0;
         end else if (sound_trigger) begin

@@ -19,7 +19,7 @@ module audio_interface(
 
     jump_sound_player i_jump(
         .clk(clk),
-        .enable(~game_is_over),
+        .rst_n(rst_n),
         .sound_trigger(jump_pulse),
         .wave_out(jump_sound)
     );
