@@ -37,7 +37,7 @@ module game_over_sound_player (
     state_t state = IDLE;
     state_t next_state = IDLE;
 
-    reg [3:0] stage_index = 0;   // 16 stages of decay values
+    reg [4:0] stage_index = 0;   // 16 stages of decay values
     reg [18:0] counter = 0;   // 19-bit counter for a maximum period of 333333
     reg active;
     reg [18:0] decay_value;
@@ -62,7 +62,6 @@ module game_over_sound_player (
             PLAY1: begin
                 if (stage_index == 15) begin
                     next_state = PLAY2;
-                    stage_index <= 0;
                 end else
                     next_state = PLAY1;
             end
@@ -116,22 +115,22 @@ module game_over_sound_player (
 
                     // Use the distinct localparams instead of array lookup
                     case (stage_index)
-                        4'd0:  decay_value<= DECAY_0;
-                        4'd1:  decay_value<= DECAY_1;
-                        4'd2:  decay_value<= DECAY_2;
-                        4'd3:  decay_value<= DECAY_3;
-                        4'd4:  decay_value<= DECAY_4;
-                        4'd5:  decay_value<= DECAY_5;
-                        4'd6:  decay_value<= DECAY_6;
-                        4'd7:  decay_value<= DECAY_7;
-                        4'd8:  decay_value<= DECAY_8;
-                        4'd9:  decay_value<= DECAY_9;
-                        4'd10: decay_value <= DECAY_10;
-                        4'd11: decay_value <= DECAY_11;
-                        4'd12: decay_value <= DECAY_12;
-                        4'd13: decay_value <= DECAY_13;
-                        4'd14: decay_value <= DECAY_14;
-                        4'd15: decay_value <= DECAY_15;
+                        5'd0:  decay_value<= DECAY_0;
+                        5'd1:  decay_value<= DECAY_1;
+                        5'd2:  decay_value<= DECAY_2;
+                        5'd3:  decay_value<= DECAY_3;
+                        5'd4:  decay_value<= DECAY_4;
+                        5'd5:  decay_value<= DECAY_5;
+                        5'd6:  decay_value<= DECAY_6;
+                        5'd7:  decay_value<= DECAY_7;
+                        5'd8:  decay_value<= DECAY_8;
+                        5'd9:  decay_value<= DECAY_9;
+                        5'd10: decay_value <= DECAY_10;
+                        5'd11: decay_value <= DECAY_11;
+                        5'd12: decay_value <= DECAY_12;
+                        5'd13: decay_value <= DECAY_13;
+                        5'd14: decay_value <= DECAY_14;
+                        5'd15: decay_value <= DECAY_15;
                     endcase
                 end
 
@@ -149,23 +148,23 @@ module game_over_sound_player (
                     end
 
                     // Use the distinct localparams instead of array lookup
-                    case (stage_index)
-                        4'd0:  decay_value<= DECAY_0;
-                        4'd1:  decay_value<= DECAY_1;
-                        4'd2:  decay_value<= DECAY_2;
-                        4'd3:  decay_value<= DECAY_3;
-                        4'd4:  decay_value<= DECAY_4;
-                        4'd5:  decay_value<= DECAY_5;
-                        4'd6:  decay_value<= DECAY_6;
-                        4'd7:  decay_value<= DECAY_7;
-                        4'd8:  decay_value<= DECAY_8;
-                        4'd9:  decay_value<= DECAY_9;
-                        4'd10: decay_value <= DECAY_10;
-                        4'd11: decay_value <= DECAY_11;
-                        4'd12: decay_value <= DECAY_12;
-                        4'd13: decay_value <= DECAY_13;
-                        4'd14: decay_value <= DECAY_14;
-                        4'd15: decay_value <= DECAY_15;
+                    case (stage_index - 15)
+                        5'd0:  decay_value<= DECAY_0;
+                        5'd1:  decay_value<= DECAY_1;
+                        5'd2:  decay_value<= DECAY_2;
+                        5'd3:  decay_value<= DECAY_3;
+                        5'd4:  decay_value<= DECAY_4;
+                        5'd5:  decay_value<= DECAY_5;
+                        5'd6:  decay_value<= DECAY_6;
+                        5'd7:  decay_value<= DECAY_7;
+                        5'd8:  decay_value<= DECAY_8;
+                        5'd9:  decay_value<= DECAY_9;
+                        5'd10: decay_value <= DECAY_10;
+                        5'd11: decay_value <= DECAY_11;
+                        5'd12: decay_value <= DECAY_12;
+                        5'd13: decay_value <= DECAY_13;
+                        5'd14: decay_value <= DECAY_14;
+                        5'd15: decay_value <= DECAY_15;
                     endcase
                 end
 
