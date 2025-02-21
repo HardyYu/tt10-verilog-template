@@ -50,10 +50,10 @@ module game_over_sound_player (
             end
 
             PLAY1: begin
-                if (stage_index == 15)
+                if (stage_index == 15) begin
                     next_state = PLAY2;
                     stage_index <= 0;
-                else
+                end else
                     next_state = PLAY1;
             end
 
