@@ -66,7 +66,7 @@ module game_over_sound_player (
                     next_state = PLAY1;
             end
 
-            PLAY1: begin
+            PLAY2: begin
                 if (stage_index == 15)
                     next_state = DONE;
                 else

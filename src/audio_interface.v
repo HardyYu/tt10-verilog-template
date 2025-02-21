@@ -6,14 +6,14 @@ module audio_interface(
     input wire jump_pulse,
     output reg sound
 );
-    wire jump_sound;
+    // wire jump_sound;
     wire game_over_sound;
 
-    always @(posedge clk or negedge rst_n) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             sound <= 0;
         end else begin
-            sound <= jump_sound | game_over_sound;
+            sound <= game_over_sound;
         end
     end
 
