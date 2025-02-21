@@ -122,7 +122,7 @@ module jump_sound_player (
                         5'd28: decay_value <= DECAY_28;
                         5'd29: decay_value <= DECAY_29;
                         5'd30: decay_value <= DECAY_30;
-                        default: decay_value = 19'd25;
+                        default: decay_value <= 19'd25;
                     endcase
                 end
                 
