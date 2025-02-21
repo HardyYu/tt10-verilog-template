@@ -27,6 +27,15 @@ module game_over_sound_player (
     localparam [18:0] DECAY_14 = 8076;
     localparam [18:0] DECAY_15 = 7300;
 
+    typedef enum logic [1:0] {
+        IDLE  = 2'b00,
+        PLAY  = 2'b01,
+        DONE  = 2'b10
+    } state_t;
+
+    state_t state = IDLE;
+    state_t next_state = IDLE;
+
     reg [3:0] stage_index = 0;   // 16 stages of decay values
     reg [18:0] counter = 0;   // 19-bit counter for a maximum period of 333333
     reg active;
