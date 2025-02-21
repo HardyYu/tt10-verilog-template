@@ -30,7 +30,7 @@ module game_over_sound_player (
     typedef enum logic [1:0] {
         IDLE  = 2'b00,
         PLAY1  = 2'b01,
-        PLAY2 = 2'b01,
+        PLAY2 = 2'b10,
         DONE  = 2'b11
     } state_t;
 
