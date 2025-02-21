@@ -172,8 +172,14 @@ module game_over_sound_player (
                     active <= 0;
                     wave_out <= 0;
                 end
-            endcase
 
+                default: begin
+                    stage_index <= 0;
+                    counter <= 0;
+                    active <= 0;
+                    wave_out <= 0;
+                end
+            endcase
         end
     end
 

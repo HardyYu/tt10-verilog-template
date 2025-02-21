@@ -73,7 +73,7 @@ module jump_sound_player (
             end
 
             PLAY: begin
-                if (counter == PWM_ARR_PERIOD && stage_index== 30 )
+                if (stage_index== 30 )
                     next_state = DONE;
                 else
                     next_state = PLAY;
@@ -90,7 +90,9 @@ module jump_sound_player (
     // State Machine
     always @(posedge clk) begin
         if (!rst_n) begin
+            active      <= 0;
             stage_index <= 0;
+            wave_out    <= 0;
             wave_out    <= 0;
         end else if (sound_trigger) begin
             active      <= 1;
