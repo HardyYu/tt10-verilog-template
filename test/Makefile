@@ -5,7 +5,7 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = project.v audio_interface.v jump_sound_player.v game_over_sound_player.v
+PROJECT_SOURCES = project.v audio_interface.v game_over_sound_player.v
 
 ifneq ($(GATES),yes)
 

@@ -17,12 +17,12 @@ module audio_interface(
         end
     end
 
-    jump_sound_player i_jump(
-        .clk(clk),
-        .rst_n(rst_n),
-        .sound_trigger(jump_pulse),
-        .wave_out(jump_sound)
-    );
+    // jump_sound_player i_jump(
+    //     .clk(clk),
+    //     .rst_n(rst_n),
+    //     .sound_trigger(jump_pulse),
+    //     .wave_out(jump_sound)
+    // );
 
     game_over_sound_player i_over(
         .clk(clk),

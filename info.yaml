@@ -20,7 +20,6 @@ project:
     - "project.v"
     - "audio_interface.v"
     - "game_over_sound_player.v"
-    - "jump_sound_player.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
