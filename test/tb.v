@@ -46,20 +46,5 @@ module tb ();
       .rst_n  (rst_n)     // not reset
   );
 
-  initial begin
-        // Initialize signals
-        clk = 0;
-        rst_n = 0;
-        sound_trigger = 0;
-        
-        // Apply reset
-        #50 rst_n = 1;
-        
-        // Wait a bit and trigger the sound
-        #100 sound_trigger = 1;
-        #20 sound_trigger = 0; // Ensure it's a one-shot pulse
-        
-  end
-
 
 endmodule

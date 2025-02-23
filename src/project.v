@@ -20,13 +20,38 @@ module tt_um_example (
   assign uio_out[6:0] = 0;
   assign uio_oe  = 8'hff;
 
+  reg jump_pulse;
+
   audio_interface i_audio_interface(
     .clk(clk),
     .rst_n(rst_n),
     .game_is_over(0),   // needs to be replaced
-    .jump_pulse(0),     // needs to be replaced
+    .jump_pulse(jump_pulse),     // needs to be replaced
     .sound(uio_out[7])
   );
+
+  localparam CLK_FREQ = 50_000_000; // 50 MHz
+  localparam CYCLES_PER_JUMP = CLK_FREQ * 3; // Jump once per 3 seconds
+
+
+  reg [31:0] jump_counter;
+  always @(posedge clk) begin
+      if (!rst_n) begin
+          jump_counter <= 0;
+          jump_pulse <= 0;
+      end 
+      else if (jump_counter >= (CYCLES_PER_JUMP - 1)) begin
+          jump_counter <= 0;
+          jump_pulse <= 1;
+      end 
+      else if (jump_counter < 3) begin
+          jump_counter <= jump_counter + 1;
+      end 
+      else begin
+          jump_counter <= jump_counter + 1;
+          jump_pulse <= 0;
+      end
+  end
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, ui_in, uio_in, 1'b0};
