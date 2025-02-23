@@ -30,10 +30,6 @@ module tt_um_example (
     .sound(uio_out[7])
   );
 
-  localparam CLK_FREQ = 50_000_000; // 50 MHz
-  localparam CYCLES_PER_JUMP = CLK_FREQ * 3; // Jump once per 3 seconds
-
-
   reg [31:0] jump_counter;
   always @(posedge clk) begin
       if (!rst_n) begin
@@ -46,7 +42,7 @@ module tt_um_example (
           jump_pulse <= 1;
       end
       else 
-        jump_counter = jump_counter + 1;
+        jump_counter <= jump_counter + 1;
 
   end
 
