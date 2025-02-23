@@ -40,17 +40,14 @@ module tt_um_example (
           jump_counter <= 0;
           jump_pulse <= 0;
       end 
-      else if (jump_counter >= (CYCLES_PER_JUMP - 1)) begin
-          jump_counter <= 0;
-          jump_pulse <= 1;
-      end 
-      else if (jump_counter < 3) begin
-          jump_counter <= jump_counter + 1;
-      end 
-      else begin
-          jump_counter <= jump_counter + 1;
+      else if (jump_counter >= 20) begin
           jump_pulse <= 0;
+      end if (jump_counter >= 10) begin
+          jump_pulse <= 1;
       end
+      else 
+        jump_counter = jump_counter + 1;
+
   end
 
   // List all unused inputs to prevent warnings
