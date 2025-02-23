@@ -40,6 +40,7 @@ module tt_um_example (
           jump_pulse <= 0;
       end else if (jump_counter == 10) begin
           jump_pulse <= 1;
+          jump_counter <= jump_counter + 1;
       end
       else 
         jump_counter <= jump_counter + 1;
