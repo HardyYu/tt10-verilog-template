@@ -12,21 +12,18 @@ module audio_interface(
     // Pipeline registers
     reg jump_sound_reg;
     reg game_over_sound_reg;
-    reg sound_reg;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             jump_sound_reg <= 0;
             game_over_sound_reg <= 0;
-            sound_reg <= 0;
+            sound <= 0;
         end else begin
             jump_sound_reg <= jump_sound;
             game_over_sound_reg <= game_over_sound;
-            sound_reg <= jump_sound_reg | game_over_sound_reg;
+            sound <= jump_sound_reg | game_over_sound_reg;
         end
     end
-
-    assign sound = sound_reg;
 
     jump_sound_player i_jump(
         .clk(clk),
